@@ -12,12 +12,14 @@ class Rental(SQLModel, table=True):
     car_uid: uuid.UUID = Field(nullable=False)
     date_from: dt.datetime = Field(nullable=False)
     date_to: dt.datetime = Field(nullable=False)
-    status: str = Field(
-        sa_column=Column(
-            "status", 
-            nullable=False, 
-            check=CheckConstraint("status IN ('IN_PROGRESS', 'FINISHED', 'CANCELED')")
-        )
+    status: str = Field(nullable=False)
+
+    # Добавляем ограничение через __table_args__
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('IN_PROGRESS', 'FINISHED', 'CANCELED')", 
+            name="status_check"
+        ),
     )
     
 class RentalDataJson(SQLModel):

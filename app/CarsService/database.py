@@ -1,5 +1,10 @@
 from sqlmodel import SQLModel, Field, Column, CheckConstraint
 import uuid
+from pydantic import BaseModel
+
+from sqlalchemy import CheckConstraint
+from sqlmodel import SQLModel, Field
+import uuid
 
 class Car(SQLModel, table=True):
     __tablename__ = "cars"
@@ -11,16 +16,16 @@ class Car(SQLModel, table=True):
     registration_number: str = Field(nullable=False, max_length=20)
     power: int = Field(default=None)
     price: int = Field(nullable=False)
-    type: str = Field(
-        sa_column=Column(
-            "type", 
-            nullable=True, 
-            check=CheckConstraint("type IN ('SEDAN', 'SUV', 'MINIVAN', 'ROADSTER')")
-        )
-    )
+    type: str = Field(nullable=True, max_length=20)  # Removed the check here.
     availability: bool = Field(nullable=False)
 
-class CarDataJson(SQLModel):
+    # Adding the CheckConstraint to validate the 'type' column
+    __table_args__ = (
+        CheckConstraint("type IN ('SEDAN', 'SUV', 'MINIVAN', 'ROADSTER')", name="check_type"),
+    )
+
+
+class CarDataJson(BaseModel):
     car_uid: str
     brand: str
     model: str
@@ -30,7 +35,14 @@ class CarDataJson(SQLModel):
     type: str
     availability: bool
 
-class CarReserveResponse(SQLModel):
+class CarReserveResponse(BaseModel):
     message: str
     car_uid: str
     availability: bool
+
+
+class CarsResponse(BaseModel):
+    page: int = 1
+    pageSize: int = 10
+    totalElements: int
+    items: list[CarDataJson]

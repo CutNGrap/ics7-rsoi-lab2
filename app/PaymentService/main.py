@@ -14,8 +14,8 @@ import uuid
 
 app = FastAPI()
 
-
-database_url = os.environ["DATABASE_URL"]
+database_url = database_url = 'postgresql://program:test@localhost:5432/payments'
+# database_url = os.environ["DATABASE_URL"]
 print(database_url)
 engine = create_engine(database_url)
 
@@ -62,3 +62,5 @@ def create_payment(payment: Payment, session: SessionDep):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request : Request, exc):
     return JSONResponse({"message": "what", "errors": exc.errors()[0]}, status_code=400)
+
+

@@ -15,7 +15,8 @@ import uuid
 app = FastAPI()
 
 
-database_url = os.environ["DATABASE_URL"]
+# database_url = os.environ["DATABASE_URL"]
+database_url = 'postgresql://program:test@localhost:5432/rentals'
 print(database_url)
 engine = create_engine(database_url)
 
@@ -45,7 +46,7 @@ def health():
     return Response(status_code=200)
 
 @app.get("/api/v1/rental", response_model=list[RentalDataJson])
-def get_user_rentals(session: Session, username: str = Header(..., alias="X-User-Name")):
+def get_user_rentals(session: SessionDep, username: str = Header(..., alias="X-User-Name")):
     rentals = session.exec(select(Rental).where(Rental.username == username)).all()
     if not rentals:
         raise HTTPException(status_code=404, detail="No rentals found for user")
@@ -65,7 +66,7 @@ def get_user_rentals(session: Session, username: str = Header(..., alias="X-User
 @app.get("/api/v1/rental/{rentalUid}", response_model=RentalDataJson)
 def get_rental_details(
     rentalUid: str, 
-    session: Session, 
+    session: SessionDep, 
     username: str = Header(..., alias="X-User-Name")
 ):
     rental = session.exec(select(Rental).where(Rental.rental_uid == rentalUid)).first()
