@@ -15,8 +15,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: docker/setup-buildx-action@v2
-
       # TODO build and run unit tests
 
        - name: UnitTests
@@ -34,6 +32,7 @@ jobs:
           pytest app/RentalService/tests.py
           docker compose down
 
+      - uses: docker/setup-buildx-action@v2
       - name: Build images
         timeout-minutes: 10
         run: docker compose build
