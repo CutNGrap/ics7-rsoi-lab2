@@ -19,13 +19,12 @@ class Rental(SQLModel, table=True):
             check=CheckConstraint("status IN ('IN_PROGRESS', 'FINISHED', 'CANCELED')")
         )
     )
-
-
-class RentalDataJSON(SQLModel):
+    
+class RentalDataJson(SQLModel):
     rental_uid: str
     username: str
     payment_uid: str
     car_uid: str
-    date_from: datetime.datetime
-    date_to: datetime.datetime
+    date_from: dt.datetime
+    date_to: dt.datetime
     status: str

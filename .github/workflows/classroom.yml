@@ -19,6 +19,21 @@ jobs:
 
       # TODO build and run unit tests
 
+       - name: UnitTests
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - run: |
+          docker compose up postgres -d
+          pip install -r requirements.txt
+          export DATABASE_URL="postgresql://program:test@localhost:5432/cars"
+          pytest app/CarsService/tests.py
+          export DATABASE_URL="postgresql://program:test@localhost:5432/payment"
+          pytest app/PaymentService/tests.py
+          export DATABASE_URL="postgresql://program:test@localhost:5432/rental"
+          pytest app/RentalService/tests.py
+          docker compose down
+
       - name: Build images
         timeout-minutes: 10
         run: docker compose build
@@ -35,8 +50,8 @@ jobs:
         uses: matt-ball/newman-action@master
         with:
           # TODO insert your variant
-          collection: <variant>/postman/collection.json
-          environment: <variant>/postman/environment.json
+          collection: v3/postman/collection.json
+          environment: v3/postman/environment.json
           delayRequest: 100
           reporters: '[ "cli" ]'
 

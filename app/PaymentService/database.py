@@ -14,3 +14,9 @@ class Payment(SQLModel, table=True):
         )
     )
     price: int = Field(nullable=False)
+
+class PaymentDataJson(SQLModel):
+    payment_uid: str
+    status: str
+    price: int
+

@@ -44,7 +44,7 @@ app = FastAPI(lifespan=lifespan)
 def health():
     return Response(status_code=200)
 
-@app.get("/api/v1/cars", response_model=list[CarDataJSON])
+@app.get("/api/v1/cars", response_model=list[CarDataJson])
 def get_all_cars(
     session: Session, 
     page: int = Query(1, alias="page", ge=1), 
@@ -60,7 +60,7 @@ def get_all_cars(
         raise HTTPException(status_code=404, detail="No cars available")
 
     return [
-        CarDataJSON(
+        CarDataJson(
             car_uid=str(car.car_uid),
             brand=car.brand,
             model=car.model,
@@ -71,6 +71,60 @@ def get_all_cars(
             availability=car.availability
         ) for car in cars
     ]
+
+
+
+@app.put("/api/v1/cars/{car_uid}/reserve", status_code=200, response_model=CarReserveResponse)
+def reserve_car(car_uid: uuid.UUID, session: SessionDep):
+    """
+    Endpoint for reserving a car by setting its availability to False.
+    """
+    # Fetch the car by UUID
+    car = session.exec(select(Car).where(Car.car_uid == car_uid)).first()
+
+    if not car:
+        raise HTTPException(status_code=404, detail="Car not found")
+
+    if not car.availability:
+        raise HTTPException(status_code=400, detail="Car is already reserved")
+
+    # Update the availability
+    car.availability = False
+    session.add(car)
+    session.commit()
+    session.refresh(car)
+
+    return CarReserveResponse(
+        message="Car reserved successfully",
+        car_uid=str(car.car_uid),
+        availability=car.availability
+    )
+
+
+@app.put("/api/v1/cars/{car_uid}/release", status_code=200, response_model=CarReserveResponse)
+def release_car(car_uid: uuid.UUID, session: SessionDep):
+    """
+    Endpoint for releasing a car by setting its availability to True.
+    """
+    car = session.exec(select(Car).where(Car.car_uid == car_uid)).first()
+
+    if not car:
+        raise HTTPException(status_code=404, detail="Car not found")
+
+    if car.availability:
+        raise HTTPException(status_code=400, detail="Car is already available")
+
+    car.availability = True
+    session.add(car)
+    session.commit()
+    session.refresh(car)
+
+    return CarReserveResponse(
+        message="Car released successfully",
+        car_uid=str(car.car_uid),
+        availability=car.availability
+    )
+
 
 
 

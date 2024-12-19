@@ -20,7 +20,7 @@ class Car(SQLModel, table=True):
     )
     availability: bool = Field(nullable=False)
 
-class CarDataJSON(SQLModel):
+class CarDataJson(SQLModel):
     car_uid: str
     brand: str
     model: str
@@ -28,4 +28,9 @@ class CarDataJSON(SQLModel):
     power: int
     price: int
     type: str
+    availability: bool
+
+class CarReserveResponse(SQLModel):
+    message: str
+    car_uid: str
     availability: bool
