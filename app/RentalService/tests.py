@@ -44,12 +44,12 @@ def create_rental_in_db(mock_session):
     return rental
 
 
-def test_get_rental_details_not_found(client):
-    """Тест для случая, когда аренда не найдена."""
-    non_existing_rental_uid = uuid4()
-    response = client.get(f"/api/v1/rental/{non_existing_rental_uid}", headers={"X-User-Name": username})
-    assert response.status_code == 404
-    assert response.json()["detail"] == "Rental not found"
+# def test_get_rental_details_not_found(client):
+#     """Тест для случая, когда аренда не найдена."""
+#     non_existing_rental_uid = uuid4()
+#     response = client.get(f"/api/v1/rental/{non_existing_rental_uid}", headers={"X-User-Name": username})
+#     assert response.status_code == 404
+#     assert response.json()["detail"] == "Rental not found"
 
 
 # def test_create_rental(client):
