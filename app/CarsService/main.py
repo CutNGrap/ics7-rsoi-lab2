@@ -95,8 +95,8 @@ def get_all_cars(
         query = query.where(Car.availability == True)
 
     cars = session.exec(query.offset((page - 1) * size).limit(size)).all()
-    if not cars:
-        raise HTTPException(status_code=404, detail="No cars available")
+    # if not cars:
+    #     raise HTTPException(status_code=404, detail="No cars available")
 
     response_data = CarsResponse(
         items=[
