@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, Field, Column, CheckConstraint
+from pydantic import BaseModel
 import uuid
 
 class Payment(SQLModel, table=True):
@@ -12,8 +13,16 @@ class Payment(SQLModel, table=True):
     status: str = Field(nullable=False)
     price: int = Field(nullable=False)
 
-class PaymentDataJson(SQLModel):
+class PaymentDataJson(BaseModel):
     payment_uid: str
     status: str
     price: int
+
+
+class PaymentJson(BaseModel):
+    payment_uid:str
+    status: str
+    price: int
+
+
 

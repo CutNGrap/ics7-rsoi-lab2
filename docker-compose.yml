@@ -67,20 +67,20 @@ services:
     networks:
       - app
   
-  # gateway:
-  #   depends_on: 
-  #     - postgres
-  #     - rental
-  #     - cars
-  #     - payment
-  #   container_name: gateway
-  #   restart: on-failure
-  #   build:
-  #     dockerfile: ./app/GatewayService/Dockerfile
-  #   ports:
-  #     - "8080:8080"
-  #   networks:
-  #     - app
+  gateway:
+    depends_on: 
+      - postgres
+      - rental
+      - cars
+      - payment
+    container_name: gateway
+    restart: on-failure
+    build:
+      dockerfile: ./app/GatewayService/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - app
 
 
 networks:

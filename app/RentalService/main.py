@@ -45,7 +45,7 @@ app = FastAPI(lifespan=lifespan)
 def health():
     return Response(status_code=200)
 
-@app.get("/api/v1/rental", response_model=list[RentalDataJson])
+@app.get("/api/v1/rentals", response_model=list[RentalDataJson])
 def get_user_rentals(session: SessionDep, username: str = Header(..., alias="X-User-Name")):
     rentals = session.exec(select(Rental).where(Rental.username == username)).all()
     if not rentals:
@@ -63,7 +63,7 @@ def get_user_rentals(session: SessionDep, username: str = Header(..., alias="X-U
         ) for rental in rentals
     ]
 
-@app.get("/api/v1/rental/{rentalUid}", response_model=RentalDataJson)
+@app.get("/api/v1/rentals/{rentalUid}", response_model=RentalDataJson)
 def get_rental_details(
     rentalUid: str, 
     session: SessionDep, 
@@ -87,21 +87,30 @@ def get_rental_details(
     )
 
 @app.post("/api/v1/rentals", status_code=201, response_model=RentalDataJson)
-def create_rental(rental: Rental, session: SessionDep):
+def create_rental(rental: RentalData, session: SessionDep):
     """
     Endpoint for creating a new rental record.
     """
-    session.add(rental)
-    session.commit()
-    session.refresh(rental)
-    return RentalDataJson(
-        rental_uid=str(rental.rental_uid),
+    dbRental = Rental(
+        rental_uid=rental.rental_uid,
         username=rental.username,
-        payment_uid=str(rental.payment_uid),
-        car_uid=str(rental.car_uid),
+        payment_uid=rental.payment_uid,
+        car_uid=rental.car_uid,
         date_from=rental.date_from,
         date_to=rental.date_to,
         status=rental.status
+    )
+    session.add(dbRental)
+    session.commit()
+    session.refresh(dbRental)
+    return RentalDataJson(
+        rental_uid=str(dbRental.rental_uid),
+        username=dbRental.username,
+        payment_uid=str(dbRental.payment_uid),
+        car_uid=str(dbRental.car_uid),
+        date_from=dbRental.date_from,
+        date_to=dbRental.date_to,
+        status=dbRental.status
     )
 
 
@@ -119,8 +128,8 @@ def cancel_rental(rental_uid: uuid.UUID, session: SessionDep, username: Annotate
     if rental.username != username:
         raise HTTPException(status_code=403, detail="Unauthorized: Username does not match")
 
-    if rental.status == "CANCELED":
-        raise HTTPException(status_code=400, detail="Rental is already canceled")
+    # if rental.status == "CANCELED":
+    #     raise HTTPException(status_code=400, detail="Rental is already canceled")
 
     rental.status = "CANCELED"
     session.add(rental)

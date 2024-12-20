@@ -115,6 +115,25 @@ def get_all_cars(
 
     return response_data
 
+@app.get("/api/v1/cars/{car_uid}", response_model=CarDataJson)
+def get_car(session: SessionDep, car_uid: str):
+    """
+    Возвращает информацию об автомобиле по его car_uid.
+    """
+    query = select(Car).where(Car.car_uid==car_uid)
+    car = session.exec(query).first()
+    if not car:
+        raise HTTPException(status_code=404, detail="Car not found")
+    return CarDataJson(
+                car_uid=str(car.car_uid),
+                brand=car.brand,
+                model=car.model,
+                registration_number=car.registration_number,
+                power=car.power,
+                price=car.price,
+                type=car.type,
+                availability=car.availability
+            )
 
 
 @app.put("/api/v1/cars/{car_uid}/reserve", status_code=200, response_model=CarReserveResponse)
@@ -128,8 +147,8 @@ def reserve_car(car_uid: uuid.UUID, session: SessionDep) -> CarReserveResponse:
     if not car:
         raise HTTPException(status_code=404, detail="Car not found")
 
-    if not car.availability:
-        raise HTTPException(status_code=400, detail="Car is already reserved")
+    # if not car.availability:
+    #     raise HTTPException(status_code=400, detail="Car is already reserved")
 
     # Update the availability
     car.availability = False
@@ -154,8 +173,8 @@ def release_car(car_uid: uuid.UUID, session: SessionDep) -> CarReserveResponse:
     if not car:
         raise HTTPException(status_code=404, detail="Car not found")
 
-    if car.availability:
-        raise HTTPException(status_code=400, detail="Car is already available")
+    # if car.availability:
+    #     raise HTTPException(status_code=400, detail="Car is already available")
 
     car.availability = True
     session.add(car)

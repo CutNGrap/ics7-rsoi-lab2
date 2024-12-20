@@ -30,3 +30,12 @@ class RentalDataJson(SQLModel):
     date_from: dt.datetime
     date_to: dt.datetime
     status: str
+
+class RentalData(SQLModel):
+    rental_uid: str
+    username: str
+    payment_uid: str
+    car_uid: str
+    date_from: dt.datetime
+    date_to: dt.datetime
+    status: str

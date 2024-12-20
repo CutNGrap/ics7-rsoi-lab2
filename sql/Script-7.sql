@@ -72,3 +72,5 @@ CREATE TABLE rental
 
 GRANT ALL PRIVILEGES ON table rental TO program;
 GRANT ALL PRIVILEGES ON table rental_id_seq TO program;
+
+GRANT ALL PRIVILEGES ON payment_id_seq TO program;
