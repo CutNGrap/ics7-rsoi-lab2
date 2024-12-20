@@ -43,7 +43,7 @@ jobs:
           docker compose up -d
           ./scripts/wait-script.sh
         env:
-          WAIT_PORTS: 8080,8070,8060,8050
+          WAIT_PORTS: 8050,8060,8070,8080
 
       - name: Run API Tests
         uses: matt-ball/newman-action@master
@@ -68,7 +68,7 @@ jobs:
           column_offset: 'F'
           mark: "'+"
 
-      - name: Stop containers
-        if: always()
-        continue-on-error: true
-        run: docker compose down -v
+      # - name: Stop containers
+      #   if: always()
+      #   continue-on-error: true
+      #   run: docker compose down -v
