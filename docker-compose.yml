@@ -37,31 +37,31 @@ services:
     networks:
       - app
   
-  rental:
+  rentals:
     depends_on: 
       postgres:
         condition: service_healthy
-    container_name: rental
+    container_name: rentals
     restart: on-failure
     build:
       dockerfile: ./app/RentalService/Dockerfile
       args:
-        database_url: "postgresql://program:test@postgres:5432/rental"
+        database_url: "postgresql://program:test@postgres:5432/rentals"
     ports:
       - "8060:8060"
     networks:
       - app
   
-  payment:
+  payments:
     depends_on: 
       postgres:
         condition: service_healthy
-    container_name: payment
+    container_name: payments
     restart: on-failure
     build:
       dockerfile: ./app/PaymentService/Dockerfile
       args:
-        database_url: "postgresql://program:test@postgres:5432/payment"
+        database_url: "postgresql://program:test@postgres:5432/payments"
     ports:
       - "8050:8050"
     networks:
@@ -70,9 +70,9 @@ services:
   gateway:
     depends_on: 
       - postgres
-      - rental
+      - rentals
       - cars
-      - payment
+      - payments
     container_name: gateway
     restart: on-failure
     build:

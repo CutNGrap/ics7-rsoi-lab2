@@ -14,9 +14,9 @@ import uuid
 
 app = FastAPI()
 
-database_url = database_url = 'postgresql://program:test@localhost/payments'
+# database_url = database_url = 'postgresql://program:test@localhost/payments'
 # database_url = 'postgresql://program:test@autorack.proxy.rlwy.net:52848/payments'
-# database_url = os.environ["DATABASE_URL"]
+database_url = os.environ["DATABASE_URL"]
 print(database_url)
 engine = create_engine(database_url)
 
