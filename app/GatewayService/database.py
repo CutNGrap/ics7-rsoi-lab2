@@ -16,7 +16,7 @@ class CarDataJson(BaseModel):
     carUid: str
     brand: str
     model: str
-    registration_number: str
+    registrationNumber: str
     power: int
     price: int
     type: str
@@ -24,12 +24,12 @@ class CarDataJson(BaseModel):
 
 
 class RentalResponse(BaseModel):
-    rental_uid: str
+    rentalUid: str
     username: str
-    payment_uid: str
-    car_uid: str
-    date_from: dt.datetime
-    date_to: dt.datetime
+    paymentUid: str
+    carUid: str
+    dateFrom: dt.datetime
+    dateTo: dt.datetime
     status: str
 
 class CreateRentalRequest(BaseModel):
@@ -75,6 +75,6 @@ class ValidationErrorResponse(BaseModel):
 
 
 class PaymentRequest(BaseModel):
-    payment_uid: uuid.UUID = Field(default_factory=uuid.uuid4, nullable=False)
+    paymentUid: uuid.UUID = Field(default_factory=uuid.uuid4, nullable=False)
     status: str = Field(nullable=False)
     price: int = Field(nullable=False)

@@ -29,7 +29,7 @@ class CarDataJson(BaseModel):
     carUid: str
     brand: str
     model: str
-    registration_number: str
+    registrationNumber: str
     power: int
     price: int
     type: str

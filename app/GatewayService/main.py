@@ -136,9 +136,9 @@ def book_car(
             raise HTTPException(status_code=500, detail="Failed to reserve car")
 
         # Считаем количество дней аренды
-        date_from = datetime.strptime(str(rental_request.dateFrom), "%Y-%m-%d")
-        date_to = datetime.strptime(str(rental_request.dateTo), "%Y-%m-%d")
-        rental_days = (date_to - date_from).days
+        dateFrom = datetime.strptime(str(rental_request.dateFrom), "%Y-%m-%d")
+        dateTo = datetime.strptime(str(rental_request.dateTo), "%Y-%m-%d")
+        rental_days = (dateTo - dateFrom).days
 
         if rental_days <= 0:
             raise HTTPException(status_code=400, detail="Invalid rental period")
@@ -163,12 +163,12 @@ def book_car(
 
         # Создаем запись в Rental Service
         rental_data = {
-            "rental_uid": str(uuid.uuid4()),
+            "rentalUid": str(uuid.uuid4()),
             "username": username,
-            "payment_uid": str(payment_data["payment_uid"]),
+            "paymentUid": str(payment_data["paymentUid"]),
             "carUid": str(carUid),
-            "date_from": str(rental_request.dateFrom),
-            "date_to": str(rental_request.dateTo),
+            "dateFrom": str(rental_request.dateFrom),
+            "dateTo": str(rental_request.dateTo),
             "status": "IN_PROGRESS"
         }
 
@@ -182,19 +182,19 @@ def book_car(
         rental_response_data =  rental_response.json()
         
         p = PaymentInfo(
-                paymentUid=str(payment_data['payment_uid']),
+                paymentUid=str(payment_data['paymentUid']),
                 status=payment_data["status"],
                 price=payment_data["price"]
             )
         
-        uid = str(rental_response_data["rental_uid"])
+        uid = str(rental_response_data["rentalUid"])
 
         ans = CreateRentalResponse(
             rentalUid=uid,
             status=rental_response_data["status"],
             carUid=str(carUid),
-            dateFrom=date_from,
-            dateTo=date_to,
+            dateFrom=dateFrom,
+            dateTo=dateTo,
             payment=p
         )
 
@@ -202,9 +202,9 @@ def book_car(
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Error communicating with services: {str(e)}")
 
-@app.post("/api/v1/rental/{rental_uid}/finish")
+@app.post("/api/v1/rental/{rentalUid}/finish")
 def finish_rental(
-    rental_uid: str,
+    rentalUid: str,
     username: Annotated[str, Header(alias="X-User-Name")]
 ) -> dict:
     """
@@ -214,7 +214,7 @@ def finish_rental(
     """
     try:
         # Check if rental exists in Rental Service
-        rental_response = requests.get(f"http://{rentalsApi}/rentals/{rental_uid}",
+        rental_response = requests.get(f"http://{rentalsApi}/rentals/{rentalUid}",
                                        headers={"X-User-Name": username})
         
         if rental_response.status_code != HTTPStatus.OK:
@@ -231,7 +231,7 @@ def finish_rental(
             "status": "FINISHED"
         }
         finish_response = requests.put(
-            f"http://{rentalsApi}/rentals/{rental_uid}/finish", 
+            f"http://{rentalsApi}/rentals/{rentalUid}/finish", 
             json=finish_rental_data
         )
         if finish_response.status_code != HTTPStatus.OK:
@@ -255,9 +255,9 @@ from http import HTTPStatus
 import requests
 from typing import Annotated
 
-@app.delete("/api/v1/rental/{rental_uid}")
+@app.delete("/api/v1/rental/{rentalUid}")
 def cancel_rental(
-    rental_uid: str,
+    rentalUid: str,
     username: Annotated[str, Header(alias="X-User-Name")]
 ) -> dict:
     """
@@ -268,7 +268,7 @@ def cancel_rental(
     """
     try:
         # Step 1: Get rental information from Rental Service
-        rental_response = requests.get(f"http://{rentalsApi}/rentals/{rental_uid}",
+        rental_response = requests.get(f"http://{rentalsApi}/rentals/{rentalUid}",
                                        headers={"X-User-Name": username})
         
         if rental_response.status_code != HTTPStatus.OK:
@@ -295,7 +295,7 @@ def cancel_rental(
             "status": "CANCELED"
         }
         rental_finish_response = requests.put(
-            f"http://{rentalsApi}/rentals/{rental_uid}/cancel",
+            f"http://{rentalsApi}/rentals/{rentalUid}/cancel",
             json=cancel_rental_data,
             headers={"X-User-Name": username}  # Include the username header
         )
@@ -304,12 +304,12 @@ def cancel_rental(
             raise HTTPException(status_code=500, detail="Failed to update rental status to CANCELED")
         
         # Step 4: Cancel the payment in Payment Service
-        payment_uid = rental_data['payment_uid']  # Assuming we get payment_uid from rental data
+        paymentUid = rental_data['paymentUid']  # Assuming we get paymentUid from rental data
         cancel_payment_data = {
             "status": "CANCELED"
         }
         payment_response = requests.put(
-            f"http://{paymentsApi}/payments/{payment_uid}/cancel",
+            f"http://{paymentsApi}/payments/{paymentUid}/cancel",
             json=cancel_payment_data,
             headers={"X-User-Name": username}  # Include the username header
         )

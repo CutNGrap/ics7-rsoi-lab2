@@ -6,11 +6,6 @@
 			"key": "baseUrl",
 			"value": "http://localhost:8080",
 			"enabled": true
-		},
-		{
-			"key": "carUid",
-			"value": "109b42f3-198d-4c89-9276-a7520a7120ab",
-			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
