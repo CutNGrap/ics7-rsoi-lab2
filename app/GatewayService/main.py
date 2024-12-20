@@ -34,13 +34,13 @@ def health_check():
 
 
 # Base URLs for services
-# cars_host = "http://cars:8070/api/v1"
-# rentals_host = "http://rentals:8060/api/v1"
-# payments_host = "http://payments:8070/api/v1"
+cars_host = "http://cars:8070/api/v1"
+rentals_host = "http://rentals:8060/api/v1"
+payments_host = "http://payments:8050/api/v1"
 
-carsApi = "localhost:8070/api/v1"
-rentalsApi = "localhost:8060/api/v1"
-paymentsApi = "localhost:8050/api/v1"
+# carsApi = "localhost:8070/api/v1"
+# rentalsApi = "localhost:8060/api/v1"
+# paymentsApi = "localhost:8050/api/v1"
 
 
 @app.get("/api/v1/cars", response_model=PaginationResponse)
