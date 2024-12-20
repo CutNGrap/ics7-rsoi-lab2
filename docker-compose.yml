@@ -69,7 +69,7 @@ services:
   
   gateway:
     depends_on: 
-      # - postgres
+      - postgres
       - rental
       - cars
       - payment
