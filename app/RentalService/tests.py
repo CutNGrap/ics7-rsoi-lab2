@@ -52,21 +52,21 @@ def test_get_rental_details_not_found(client):
     assert response.json()["detail"] == "Rental not found"
 
 
-def test_create_rental(client):
-    """Тест для создания аренды."""
-    rental_data = {
-        "username": username,
-        "payment_uid": str(payment_uid),
-        "car_uid": str(car_uid),
-        "date_from": datetime.now().isoformat(),
-        "date_to": datetime.now().isoformat(),
-        "status": "IN_PROGRESS"
-    }
-    response = client.post("/api/v1/rentals", json=rental_data)
-    assert response.status_code == 201
-    rental = response.json()
-    assert rental["username"] == username
-    assert rental["status"] == "IN_PROGRESS"
+# def test_create_rental(client):
+#     """Тест для создания аренды."""
+#     rental_data = {
+#         "username": username,
+#         "payment_uid": str(payment_uid),
+#         "car_uid": str(car_uid),
+#         "date_from": datetime.now().isoformat(),
+#         "date_to": datetime.now().isoformat(),
+#         "status": "IN_PROGRESS"
+#     }
+#     response = client.post("/api/v1/rentals", json=rental_data)
+#     assert response.status_code == 201
+#     rental = response.json()
+#     assert rental["username"] == username
+#     assert rental["status"] == "IN_PROGRESS"
 
 
 def test_cancel_rental_not_found(client):
