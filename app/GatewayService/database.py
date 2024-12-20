@@ -13,7 +13,7 @@ class PaginationResponse(BaseModel):
 
 
 class CarDataJson(BaseModel):
-    car_uid: str
+    carUid: str
     brand: str
     model: str
     registration_number: str

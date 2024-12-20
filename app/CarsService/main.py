@@ -101,7 +101,7 @@ def get_all_cars(
     response_data = CarsResponse(
         items=[
             CarDataJson(
-                car_uid=str(car.car_uid),
+                carUid=str(car.car_uid),
                 brand=car.brand,
                 model=car.model,
                 registration_number=car.registration_number,
@@ -126,7 +126,7 @@ def get_car(session: SessionDep, car_uid: str):
     if not car:
         raise HTTPException(status_code=404, detail="Car not found")
     return CarDataJson(
-                car_uid=str(car.car_uid),
+                carUid=str(car.car_uid),
                 brand=car.brand,
                 model=car.model,
                 registration_number=car.registration_number,
