@@ -35,11 +35,11 @@ def test_get_all_cars(client):
     assert response.status_code == 200
     cars = response.json()["items"]
     assert len(cars) > 0  # Проверим, что хотя бы одна машина есть
-    assert cars[0]["car_uid"] == carId
+    assert cars[0]["carUid"] == carId
 
 
 def test_reserve_car(client):
-    # Тест для бронирования машины через /api/v1/cars/{car_uid}/reserve
+    # Тест для бронирования машины через /api/v1/cars/{carUid}/reserve
     response = client.put(f"/api/v1/cars/{carId}/reserve")
     assert response.status_code == 200
     assert response.json()["message"] == "Car reserved successfully"

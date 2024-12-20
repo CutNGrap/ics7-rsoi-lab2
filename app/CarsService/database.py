@@ -37,7 +37,7 @@ class CarDataJson(BaseModel):
 
 class CarReserveResponse(BaseModel):
     message: str
-    car_uid: str
+    carUid: str
     availability: bool
 
 

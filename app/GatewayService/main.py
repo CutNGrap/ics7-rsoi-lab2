@@ -119,8 +119,8 @@ def book_car(
     """
     try:
         # Проверяем, существует ли автомобиль
-        car_uid = rental_request.carUid
-        response = requests.get(f"http://{carsApi}/cars/{car_uid}")
+        carUid = rental_request.carUid
+        response = requests.get(f"http://{carsApi}/cars/{carUid}")
         if response.status_code != HTTPStatus.OK:
             raise HTTPException(status_code=404, detail="Car not found")
 
@@ -130,7 +130,7 @@ def book_car(
 
         # Резервируем автомобиль
         reserve_response = requests.put(
-            f"http://{carsApi}/cars/{car_uid}/reserve"
+            f"http://{carsApi}/cars/{carUid}/reserve"
         )
         if reserve_response.status_code != HTTPStatus.OK:
             raise HTTPException(status_code=500, detail="Failed to reserve car")
@@ -166,7 +166,7 @@ def book_car(
             "rental_uid": str(uuid.uuid4()),
             "username": username,
             "payment_uid": str(payment_data["payment_uid"]),
-            "car_uid": str(car_uid),
+            "carUid": str(carUid),
             "date_from": str(rental_request.dateFrom),
             "date_to": str(rental_request.dateTo),
             "status": "IN_PROGRESS"
@@ -192,7 +192,7 @@ def book_car(
         ans = CreateRentalResponse(
             rentalUid=uid,
             status=rental_response_data["status"],
-            carUid=str(car_uid),
+            carUid=str(carUid),
             dateFrom=date_from,
             dateTo=date_to,
             payment=p
@@ -238,9 +238,9 @@ def finish_rental(
             raise HTTPException(status_code=500, detail="Failed to update rental status")
         
         # Remove reservation on the car in Car Service
-        car_uid = rental_data["car_uid"]
+        carUid = rental_data["carUid"]
         unreserve_response = requests.put(
-            f"http://{carsApi}/cars/{car_uid}/release"
+            f"http://{carsApi}/cars/{carUid}/release"
         )
         if unreserve_response.status_code != HTTPStatus.OK:
             raise HTTPException(status_code=500, detail="Failed to unreserve car")
@@ -282,10 +282,10 @@ def cancel_rental(
 
         # Remove reservation on the car in Car Service
 
-        car_uid = rental_data["car_uid"]
-        print('\n\n',car_uid,'\n\n')
+        carUid = rental_data["carUid"]
+        print('\n\n',carUid,'\n\n')
         unreserve_response = requests.put(
-            f"http://{carsApi}/cars/{car_uid}/release"
+            f"http://{carsApi}/cars/{carUid}/release"
         )
         if unreserve_response.status_code != HTTPStatus.OK:
             raise HTTPException(status_code=500, detail="Failed to unreserve car")
