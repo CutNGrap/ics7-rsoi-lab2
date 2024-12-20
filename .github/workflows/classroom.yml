@@ -43,7 +43,7 @@ jobs:
           docker compose up -d
           ./scripts/wait-script.sh
         env:
-          WAIT_PORTS: 8050,8060,8070
+          WAIT_PORTS: 8070
 
       - name: Run API Tests
         uses: matt-ball/newman-action@master
