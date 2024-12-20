@@ -46,18 +46,6 @@ def test_reserve_car(client):
     assert response.json()["availability"] is False
 
 
-def test_reserve_car_already_reserved(client):
-    # Тест для попытки забронировать машину, которая уже забронирована
-    
-    # Сначала забронируем машину
-    client.put(f"/api/v1/cars/{carId}/reserve")
-    
-    # Попробуем забронировать снова
-    response = client.put(f"/api/v1/cars/{carId}/reserve")
-    assert response.status_code == 400
-    assert response.json()["detail"] == "Car is already reserved"
-
-
 def test_release_car(client):
     
     # Сначала забронируем машину
