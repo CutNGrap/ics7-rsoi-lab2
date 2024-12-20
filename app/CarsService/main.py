@@ -17,7 +17,8 @@ app = FastAPI()
 
 # database_url = os.environ["DATABASE_URL"]
 # database_url = 'postgresql://program:test@localhost/cars'
-database_url = 'postgresql://program:test@localhost/cars'
+# database_url = 'postgresql://program:test@localhost/cars'
+database_url = 'postgresql://program:test@autorack.proxy.rlwy.net:52848/cars'
 print(database_url)
 engine = create_engine(database_url)
 
@@ -43,7 +44,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get('/manage/health', status_code=200) 
 def health():
-    return Response(status_code=200)
+    return 
 
 @app.post("/api/v1/init", status_code=201)
 def init_car(session: Session = Depends(get_session)):

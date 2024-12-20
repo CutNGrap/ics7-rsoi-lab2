@@ -14,7 +14,8 @@ import uuid
 
 app = FastAPI()
 
-database_url = database_url = 'postgresql://program:test@localhost/payments'
+# database_url = database_url = 'postgresql://program:test@localhost/payments'
+database_url = 'postgresql://program:test@autorack.proxy.rlwy.net:52848/payments'
 # database_url = os.environ["DATABASE_URL"]
 print(database_url)
 engine = create_engine(database_url)
@@ -39,11 +40,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
-@app.get('/manage/health', status_code=200)
-def health():
-    return Response(status_code=200)
-
 app = FastAPI()
 
 # Create a Pydantic model to respond with
@@ -53,6 +49,11 @@ app = FastAPI()
 def get_db():
     # This is a placeholder for actual database session handling
     pass
+
+
+@app.get('/manage/health', status_code=200) 
+def health():
+    return 
 
 @app.post("/api/v1/payments", status_code=201, response_model=PaymentDataJson)
 def create_payment(payment: PaymentJson, session: SessionDep):
