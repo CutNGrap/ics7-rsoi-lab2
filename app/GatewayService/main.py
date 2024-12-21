@@ -14,15 +14,21 @@ import requests
 from datetime import datetime
 import uuid
 
-# carsHost = "cars:8070"
-# rentalsHost = "rentals:8060"
-# paymentsHost = "payments:8050"
-# carsApi = f"{carsHost}/api/v1"
-# rentalsApi = f"{rentalsHost}/api/v1"
-# paymentsApi = f"{paymentsHost}/api/v1"
+# carsApi = "localhost:8070/api/v1"
+# rentalsApi = "localhost:8060/api/v1"
+# paymentsApi = "localhost:8050/api/v1"
+
+carsHost = "cars:8070"
+
+
+carsApi = "cars:8070/api/v1"
+rentalsApi = "rentals:8060/api/v1"
+paymentsApi = "payments:8050/api/v1"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    requests.post(f"http://{carsHost}/manage/init")
     yield  
 
 app = FastAPI(lifespan=lifespan)
@@ -34,14 +40,6 @@ def health_check():
 
 
 # Base URLs for services
-
-# carsApi = "localhost:8070/api/v1"
-# rentalsApi = "localhost:8060/api/v1"
-# paymentsApi = "localhost:8050/api/v1"
-
-carsApi = "cars:8070/api/v1"
-rentalsApi = "rentals:8060/api/v1"
-paymentsApi = "payments:8050/api/v1"
 
 
 @app.get("/api/v1/cars", response_model=PaginationResponse)

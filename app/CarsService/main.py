@@ -45,6 +45,16 @@ app = FastAPI(lifespan=lifespan)
 def health():
     return 
 
+@app.post('/manage/init')
+def init(session: SessionDep):
+    query = text("""select * from cars where id=1""")
+    if not session.exec(query).first():
+        query = text("""insert into cars values
+    (1, '109b42f3-198d-4c89-9276-a7520a7120ab', 'Mercedes Benz', 'GLA 250', 'ЛО777Х799', '249', '3500', 'SEDAN', 'true')
+    """)
+        session.exec(query)
+        session.commit()
+
 @app.get("/api/v1/cars", response_model=CarsResponse)
 def get_all_cars(
     session: SessionDep, 
