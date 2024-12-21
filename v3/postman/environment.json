@@ -6,12 +6,12 @@
 			"key": "baseUrl",
 			"value": "http://localhost:8080",
 			"enabled": true
-		},
-		{
-			"key": "rentalUid",
-			"value": "40ed0c2c-5309-4fd5-9656-8de162077e07",
-			"enabled": true
 		}
+		// {
+		// 	"key": "rentalUid",
+		// 	"value": "40ed0c2c-5309-4fd5-9656-8de162077e07",
+		// 	"enabled": true
+		// }
 	],
 	"_postman_variable_scope": "environment",
 	"_postman_exported_at": "2021-10-15T18:18:12.152Z",
