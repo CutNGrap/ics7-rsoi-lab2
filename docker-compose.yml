@@ -31,7 +31,7 @@ services:
     build:
       dockerfile: ./app/CarsService/Dockerfile
       args:
-        database_url: "postgresql://program:test@postgres:5432/cars"
+        database_url: "postgresql://program:test@autorack.proxy.rlwy.net:52848/cars"
     ports:
       - "8070:8070"
     networks:
@@ -46,7 +46,7 @@ services:
     build:
       dockerfile: ./app/RentalService/Dockerfile
       args:
-        database_url: "postgresql://program:test@postgres:5432/rentals"
+        database_url: "postgresql://program:test@autorack.proxy.rlwy.net:52848/rentals"
     ports:
       - "8060:8060"
     networks:
@@ -61,7 +61,7 @@ services:
     build:
       dockerfile: ./app/PaymentService/Dockerfile
       args:
-        database_url: "postgresql://program:test@postgres:5432/payments"
+        database_url: "postgresql://program:test@autorack.proxy.rlwy.net:52848/payments"
     ports:
       - "8050:8050"
     networks:
