@@ -23,19 +23,19 @@ class Rental(SQLModel, table=True):
     )
     
 class RentalDataJson(SQLModel):
-    rental_uid: str
+    rentalUid: str
     username: str
-    payment_uid: str
-    car_uid: str
-    date_from: dt.datetime
-    date_to: dt.datetime
+    paymentUid: str
+    carUid: str
+    dateFrom: dt.date
+    dateTo: dt.date
     status: str
 
 class RentalData(SQLModel):
-    rental_uid: str
+    rentalUid: str
     username: str
-    payment_uid: str
-    car_uid: str
-    date_from: dt.datetime
-    date_to: dt.datetime
+    paymentUid: str
+    carUid: str
+    date_from: dt.date
+    date_to: dt.date
     status: str

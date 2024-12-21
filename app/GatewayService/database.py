@@ -20,17 +20,26 @@ class CarDataJson(BaseModel):
     power: int
     price: int
     type: str
-    availability: bool
+    available: bool
 
+class CarData(BaseModel):
+    carUid: str
+    brand: str
+    model: str
+    registrationNumber: str
+
+class PaymentData(BaseModel):
+    paymentUid: str
+    status: str
+    price: int
 
 class RentalResponse(BaseModel):
     rentalUid: str
-    username: str
-    paymentUid: str
-    carUid: str
-    dateFrom: dt.datetime
-    dateTo: dt.datetime
     status: str
+    dateFrom: str
+    dateTo: str
+    car: CarData
+    payment: PaymentData
 
 class CreateRentalRequest(BaseModel):
     carUid: UUID4
@@ -57,7 +66,7 @@ class CarInfo(BaseModel):
 class PaymentInfo(BaseModel):
     paymentUid: UUID4
     status: Literal['PAID', 'REVERSED']
-    price: float
+    price: int
 
 
 class ErrorDescription(BaseModel):

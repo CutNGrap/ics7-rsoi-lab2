@@ -45,44 +45,6 @@ app = FastAPI(lifespan=lifespan)
 def health():
     return 
 
-@app.post("/api/v1/init", status_code=201)
-def init_car(session: Session = Depends(get_session)):
-    # Данные машины
-    car_data = Car(
-        car_uid=uuid.UUID("109b42f3-198d-4c89-9276-a7520a7120ab"),
-        brand="Mercedes Benz",
-        model="GLA 250",
-        registrationNumber="ЛО777Х799",
-        power=249,
-        price=3500,
-        type="SEDAN",
-        availability=True
-    )
-
-    # Проверка на уникальность car_uid
-    existing_car = session.exec(select(Car).where(Car.car_uid == car_data.car_uid)).first()
-    if existing_car:
-        raise HTTPException(status_code=400, detail="Car with this car_uid already exists.")
-
-    # Добавляем машину в базу данных
-    session.add(car_data)
-    session.commit()
-    session.refresh(car_data)
-
-    return {
-        "message": "Car added successfully",
-        "car": {
-            "car_uid": str(car_data.car_uid),
-            "brand": car_data.brand,
-            "model": car_data.model,
-            "registrationNumber": car_data.registrationNumber,
-            "power": car_data.power,
-            "price": car_data.price,
-            "type": car_data.type,
-            "availability": car_data.availability
-        }
-    }
-
 @app.get("/api/v1/cars", response_model=CarsResponse)
 def get_all_cars(
     session: SessionDep, 
@@ -104,11 +66,11 @@ def get_all_cars(
                 carUid=str(car.car_uid),
                 brand=car.brand,
                 model=car.model,
-                registrationNumber=car.registrationNumber,
+                registrationNumber=car.registration_number,
                 power=car.power,
                 price=car.price,
                 type=car.type,
-                availability=car.availability
+                available=car.availability
             ) for car in cars
         ],
         totalElements=len(cars)  # Optionally include the total count of cars
@@ -129,11 +91,11 @@ def get_car(session: SessionDep, car_uid: str):
                 carUid=str(car.car_uid),
                 brand=car.brand,
                 model=car.model,
-                registrationNumber=car.registrationNumber,
+                registrationNumber=car.registration_number,
                 power=car.power,
                 price=car.price,
                 type=car.type,
-                availability=car.availability
+                available=car.availability
             )
 
 
@@ -159,8 +121,8 @@ def reserve_car(car_uid: uuid.UUID, session: SessionDep) -> CarReserveResponse:
 
     return CarReserveResponse(
         message="Car reserved successfully",
-        car_uid=str(car.car_uid),
-        availability=car.availability
+        carUid=str(car.car_uid),
+        available=car.availability
     )
 
 
@@ -184,8 +146,8 @@ def release_car(car_uid: uuid.UUID, session: SessionDep) -> CarReserveResponse:
 
     return CarReserveResponse(
         message="Car released successfully",
-        car_uid=str(car.car_uid),
-        availability=car.availability
+        carUid=str(car.car_uid),
+        available=car.availability
     )
 
 

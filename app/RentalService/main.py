@@ -54,12 +54,12 @@ def get_user_rentals(session: SessionDep, username: str = Header(..., alias="X-U
 
     return [
         RentalDataJson(
-            rental_uid=str(rental.rental_uid),
+            rentalUid=str(rental.rental_uid),
             username=rental.username,
-            payment_uid=str(rental.payment_uid),
-            car_uid=str(rental.car_uid),
-            date_from=rental.date_from,
-            date_to=rental.date_to,
+            paymentUid=str(rental.payment_uid),
+            carUid=str(rental.car_uid),
+            dateFrom=rental.date_from,
+            dateTo=rental.date_to,
             status=rental.status
         ) for rental in rentals
     ]
@@ -70,6 +70,7 @@ def get_rental_details(
     session: SessionDep, 
     username: str = Header(..., alias="X-User-Name")
 ):
+    if (rentalUid[0]==':'): rentalUid=rentalUid[1:]
     rental = session.exec(select(Rental).where(Rental.rental_uid == rentalUid)).first()
     if not rental:
         raise HTTPException(status_code=404, detail="Rental not found")
@@ -78,12 +79,12 @@ def get_rental_details(
         raise HTTPException(status_code=403, detail="Unauthorized to view this rental")
 
     return RentalDataJson(
-        rental_uid=str(rental.rental_uid),
+        rentalUid=str(rental.rental_uid),
         username=rental.username,
-        payment_uid=str(rental.payment_uid),
-        car_uid=str(rental.car_uid),
-        date_from=rental.date_from,
-        date_to=rental.date_to,
+        paymentUid=str(rental.payment_uid),
+        carUid=str(rental.car_uid),
+        dateFrom=rental.date_from,
+        dateTo=rental.date_to,
         status=rental.status
     )
 
@@ -93,10 +94,10 @@ def create_rental(rental: RentalData, session: SessionDep):
     Endpoint for creating a new rental record.
     """
     dbRental = Rental(
-        rental_uid=rental.rental_uid,
+        rental_uid=rental.rentalUid,
         username=rental.username,
-        payment_uid=rental.payment_uid,
-        car_uid=rental.car_uid,
+        payment_uid=rental.paymentUid,
+        car_uid=rental.carUid,
         date_from=rental.date_from,
         date_to=rental.date_to,
         status=rental.status
@@ -105,29 +106,30 @@ def create_rental(rental: RentalData, session: SessionDep):
     session.commit()
     session.refresh(dbRental)
     return RentalDataJson(
-        rental_uid=str(dbRental.rental_uid),
+        rentalUid=str(dbRental.rental_uid),
         username=dbRental.username,
-        payment_uid=str(dbRental.payment_uid),
-        car_uid=str(dbRental.car_uid),
-        date_from=dbRental.date_from,
-        date_to=dbRental.date_to,
+        paymentUid=str(dbRental.payment_uid),
+        carUid=str(dbRental.car_uid),
+        dateFrom=dbRental.date_from.date(),
+        dateTo=dbRental.date_to.date(),
         status=dbRental.status
     )
 
 
 
 @app.put("/api/v1/rentals/{rental_uid}/cancel", status_code=200, response_model=RentalDataJson)
-def cancel_rental(rental_uid: uuid.UUID, session: SessionDep, username: Annotated[str, Header(alias="X-User-Name")]):
+def cancel_rental(rental_uid: str, session: SessionDep, username: Annotated[str, Header(alias="X-User-Name")]):
     """
     Endpoint for canceling a rental.
     """
+    if (rental_uid[0]==':'): rental_uid=rental_uid[1:]
     rental = session.exec(select(Rental).where(Rental.rental_uid == rental_uid)).first()
 
     if not rental:
         raise HTTPException(status_code=404, detail="Rental not found")
 
-    if rental.username != username:
-        raise HTTPException(status_code=403, detail="Unauthorized: Username does not match")
+    # if rental.username != username:
+    #     raise HTTPException(status_code=403, detail="Unauthorized: Username does not match")
 
     # if rental.status == "CANCELED":
     #     raise HTTPException(status_code=400, detail="Rental is already canceled")
@@ -138,12 +140,12 @@ def cancel_rental(rental_uid: uuid.UUID, session: SessionDep, username: Annotate
     session.refresh(rental)
 
     return RentalDataJson(
-        rental_uid=str(rental.rental_uid),
+        rentalUid=str(rental.rental_uid),
         username=rental.username,
-        payment_uid=str(rental.payment_uid),
-        car_uid=str(rental.car_uid),
-        date_from=rental.date_from,
-        date_to=rental.date_to,
+        paymentUid=str(rental.payment_uid),
+        carUid=str(rental.car_uid),
+        dateFrom=rental.date_from.date(),
+        dateTo=rental.date_to.date(),
         status=rental.status
     )
 
@@ -167,12 +169,12 @@ def finish_rental(rental_uid: uuid.UUID, session: SessionDep):
     session.refresh(rental)
 
     return RentalDataJson(
-        rental_uid=str(rental.rental_uid),
+        rentalUid=str(rental.rental_uid),
         username=rental.username,
-        payment_uid=str(rental.payment_uid),
-        car_uid=str(rental.car_uid),
-        date_from=rental.date_from,
-        date_to=rental.date_to,
+        paymentUid=str(rental.payment_uid),
+        carUid=str(rental.car_uid),
+        dateFrom=rental.date_from.date(),
+        dateTo=rental.date_to.date(),
         status=rental.status
     )
 

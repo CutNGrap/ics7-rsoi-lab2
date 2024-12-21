@@ -59,7 +59,7 @@ def get_cars(
         return PaginationResponse(page=page, size=size, totalElements=0, items=[])
     
 
-@app.get("/api/v1/rentals", response_model=list[RentalResponse])
+@app.get("/api/v1/rental", response_model=list[RentalResponse])
 def get_user_rentals(
     username: Annotated[str, Header(alias="X-User-Name")]
 ):
@@ -71,8 +71,50 @@ def get_user_rentals(
         response = requests.get(f"http://{rentalsApi}/rentals", headers={"X-User-Name": username})
         
         if response.status_code == HTTPStatus.OK:
+            ans = []
             rentals = response.json()
-            return rentals
+            for rental in rentals:
+
+                carUid = rental["carUid"]
+                paymentUid = rental["paymentUid"]
+
+                carResponse = requests.get(
+                    f"http://{carsApi}/cars/{carUid}?showAll=true"
+                )
+
+                if carResponse.status_code != HTTPStatus.OK:
+                    raise HTTPException(status_code=404, detail="Couldnt finde car")
+                
+                payResponse = requests.get(
+                    f"http://{paymentsApi}/payment/{paymentUid}"
+                )
+
+                if payResponse.status_code != HTTPStatus.OK:
+                    raise HTTPException(status_code=404, detail="Couldnt finde payment")
+
+
+                carData = carResponse.json()
+                payData= payResponse.json()
+
+                ans.append(RentalResponse(
+                    rentalUid=rental["rentalUid"],
+                    status = rental["status"],
+                    dateFrom = rental["dateFrom"],
+                    dateTo = rental["dateTo"],
+                    car = CarData(
+                        carUid = carData["carUid"],
+                        brand = carData["brand"],
+                        model = carData["model"],
+                        registrationNumber = carData["registrationNumber"]
+                    ),
+                    payment=PaymentData(
+                        paymentUid = paymentUid,
+                        status = payData["status"],
+                        price = payData["price"],
+                    )
+                ))
+
+            return ans
         elif response.status_code == HTTPStatus.NOT_FOUND:
             raise HTTPException(status_code=404, detail="No rentals found for user")
         else:
@@ -81,7 +123,7 @@ def get_user_rentals(
         raise HTTPException(status_code=500, detail=f"Error communicating with RentalsService: {str(e)}")
 
 
-@app.get("/api/v1/rentals/{rentalUid}", response_model=RentalResponse)
+@app.get("/api/v1/rental/{rentalUid}", response_model=RentalResponse)
 def get_rental_details(
     rentalUid: str,
     username: Annotated[str, Header(alias="X-User-Name")]
@@ -98,7 +140,44 @@ def get_rental_details(
         
         if response.status_code == HTTPStatus.OK:
             rental = response.json()
-            return rental
+            carUid = rental["carUid"]
+            paymentUid = rental["paymentUid"]
+
+            carResponse = requests.get(
+                f"http://{carsApi}/cars/{carUid}?showAll=true"
+            )
+
+            if carResponse.status_code != HTTPStatus.OK:
+                raise HTTPException(status_code=404, detail="Couldnt finde car")
+            
+            payResponse = requests.get(
+                f"http://{paymentsApi}/payment/{paymentUid}"
+            )
+
+            if payResponse.status_code != HTTPStatus.OK:
+                raise HTTPException(status_code=404, detail="Couldnt finde payment")
+
+
+            carData = carResponse.json()
+            payData= payResponse.json()
+
+            return RentalResponse(
+                rentalUid=rental["rentalUid"],
+                status = rental["status"],
+                dateFrom = rental["dateFrom"],
+                dateTo = rental["dateTo"],
+                car = CarData(
+                    carUid = carData["carUid"],
+                    brand = carData["brand"],
+                    model = carData["model"],
+                    registrationNumber = carData["registrationNumber"]
+                ),
+                payment=PaymentData(
+                    paymentUid = paymentUid,
+                    status = payData["status"],
+                    price = payData["price"],
+                )
+            )
         elif response.status_code == HTTPStatus.NOT_FOUND:
             raise HTTPException(status_code=404, detail="Rental not found")
         elif response.status_code == HTTPStatus.FORBIDDEN:
@@ -109,7 +188,7 @@ def get_rental_details(
         raise HTTPException(status_code=500, detail=f"Error communicating with RentalsService: {str(e)}")
     
 
-@app.post("/api/v1/rental", status_code=201)
+@app.post("/api/v1/rental", status_code=200)
 def book_car(
     rental_request: CreateRentalRequest, 
     username: Annotated[str, Header(alias="X-User-Name")]
@@ -136,9 +215,9 @@ def book_car(
             raise HTTPException(status_code=500, detail="Failed to reserve car")
 
         # Считаем количество дней аренды
-        dateFrom = datetime.strptime(str(rental_request.dateFrom), "%Y-%m-%d")
-        dateTo = datetime.strptime(str(rental_request.dateTo), "%Y-%m-%d")
-        rental_days = (dateTo - dateFrom).days
+        date_from = datetime.strptime(str(rental_request.dateFrom), "%Y-%m-%d")
+        date_to = datetime.strptime(str(rental_request.dateTo), "%Y-%m-%d")
+        rental_days = (date_to - date_from).days
 
         if rental_days <= 0:
             raise HTTPException(status_code=400, detail="Invalid rental period")
@@ -152,12 +231,12 @@ def book_car(
             "price": total_price
         }
         payment_response = requests.post(
-            f"http://{paymentsApi}/payments", json=payment_request
+            f"http://{paymentsApi}/payment", json=payment_request
         )
-        if payment_response.status_code != HTTPStatus.CREATED:
-            raise HTTPException(status_code=500, detail="Failed to create payment")
+        
+        # if payment_response.status_code != HTTPStatus.CREATED:
+        #     raise HTTPException(status_code=500, detail="Failed to create payment")
 
-        print('\n\n\n',payment_response.json(), '\n\n\n')
         payment_data = payment_response.json()
 
 
@@ -167,8 +246,8 @@ def book_car(
             "username": username,
             "paymentUid": str(payment_data["paymentUid"]),
             "carUid": str(carUid),
-            "dateFrom": str(rental_request.dateFrom),
-            "dateTo": str(rental_request.dateTo),
+            "date_from": str(rental_request.dateFrom),
+            "date_to": str(rental_request.dateTo),
             "status": "IN_PROGRESS"
         }
 
@@ -193,8 +272,8 @@ def book_car(
             rentalUid=uid,
             status=rental_response_data["status"],
             carUid=str(carUid),
-            dateFrom=dateFrom,
-            dateTo=dateTo,
+            dateFrom=date_from,
+            dateTo=date_to,
             payment=p
         )
 
@@ -202,11 +281,11 @@ def book_car(
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Error communicating with services: {str(e)}")
 
-@app.post("/api/v1/rental/{rentalUid}/finish")
+@app.post("/api/v1/rental/{rentalUid}/finish", status_code=204)
 def finish_rental(
     rentalUid: str,
     username: Annotated[str, Header(alias="X-User-Name")]
-) -> dict:
+):
     """
     Завершение аренды автомобиля.
     С автомобиля снимается резерв.
@@ -245,7 +324,7 @@ def finish_rental(
         if unreserve_response.status_code != HTTPStatus.OK:
             raise HTTPException(status_code=500, detail="Failed to unreserve car")
         
-        return {"message": "Car rental finished successfully"}
+        return 
     
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Error communicating with services: {str(e)}")
@@ -255,11 +334,11 @@ from http import HTTPStatus
 import requests
 from typing import Annotated
 
-@app.delete("/api/v1/rental/{rentalUid}")
+@app.delete("/api/v1/rental/{rentalUid}", status_code=204)
 def cancel_rental(
     rentalUid: str,
     username: Annotated[str, Header(alias="X-User-Name")]
-) -> dict:
+):
     """
     Отмена аренды автомобиля.
     С автомобиля снимается резерв.
@@ -317,7 +396,7 @@ def cancel_rental(
         if payment_response.status_code != HTTPStatus.OK:
             raise HTTPException(status_code=500, detail="Failed to update payment status to CANCELED")
         
-        return {"message": "Rental and payment canceled successfully"}
+        return 
     
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Error communicating with services: {str(e)}")

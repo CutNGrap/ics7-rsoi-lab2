@@ -55,7 +55,23 @@ def get_db():
 def health():
     return 
 
-@app.post("/api/v1/payments", status_code=201, response_model=PaymentDataJson)
+@app.get("/api/v1/payment/{paymentUid}", status_code=200, response_model=PaymentDataJson)
+def create_payment(paymentUid: str,  session: SessionDep):
+    """
+    Endpoint for getting a payment record.
+    """
+    payment = session.exec(select(Payment).where(Payment.payment_uid == paymentUid)).first()
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    return PaymentDataJson(
+        paymentUid=str(payment.payment_uid),
+        status=payment.status,
+        price=payment.price
+    )
+
+
+@app.post("/api/v1/payment", status_code=201, response_model=PaymentDataJson)
 def create_payment(payment: PaymentJson, session: SessionDep):
     """
     Endpoint for creating a new payment record.
@@ -69,14 +85,14 @@ def create_payment(payment: PaymentJson, session: SessionDep):
     session.commit()
     session.refresh(dbPayment)
     return PaymentDataJson(
-        payment_uid=str(dbPayment.payment_uid),
+        paymentUid=str(dbPayment.payment_uid),
         status=dbPayment.status,
         price=dbPayment.price
     )
 
 
 @app.put("/api/v1/payments/{payment_uid}/cancel", status_code=200, response_model=PaymentDataJson)
-def cancel_payment(payment_uid: uuid.UUID, session: SessionDep):
+def cancel_payment(payment_uid: str, session: SessionDep):
     """
     Endpoint for canceling a payment.
     """
@@ -94,7 +110,7 @@ def cancel_payment(payment_uid: uuid.UUID, session: SessionDep):
     session.refresh(payment)
 
     return PaymentDataJson(
-        payment_uid=str(payment.payment_uid),
+        paymentUid=str(payment.payment_uid),
         status=payment.status,
         price=payment.price
     )

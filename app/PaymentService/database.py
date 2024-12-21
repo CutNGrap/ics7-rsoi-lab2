@@ -14,13 +14,12 @@ class Payment(SQLModel, table=True):
     price: int = Field(nullable=False)
 
 class PaymentDataJson(BaseModel):
-    payment_uid: str
+    paymentUid: str
     status: str
     price: int
 
 
 class PaymentJson(BaseModel):
-    payment_uid:str
     status: str
     price: int
 

@@ -33,12 +33,12 @@ class CarDataJson(BaseModel):
     power: int
     price: int
     type: str
-    availability: bool
+    available: bool
 
 class CarReserveResponse(BaseModel):
     message: str
     carUid: str
-    availability: bool
+    available: bool
 
 
 class CarsResponse(BaseModel):

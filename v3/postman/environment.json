@@ -6,6 +6,11 @@
 			"key": "baseUrl",
 			"value": "http://localhost:8080",
 			"enabled": true
+		},
+		{
+			"key": "rentalUid",
+			"value": "40ed0c2c-5309-4fd5-9656-8de162077e07",
+			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
