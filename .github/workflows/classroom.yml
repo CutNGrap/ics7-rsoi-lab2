@@ -68,7 +68,7 @@ jobs:
       #     column_offset: 'F'
       #     mark: "'+"
 
-      - name: Stop containers
-        if: always()
-        continue-on-error: true
-        run: docker compose down -v
+      # - name: Stop containers
+      #   if: always()
+      #   continue-on-error: true
+      #   run: docker compose down -v
