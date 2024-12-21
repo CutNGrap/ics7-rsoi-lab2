@@ -44,7 +44,7 @@ app = FastAPI(lifespan=lifespan)
 @app.get('/manage/health', status_code=200) 
 def health():
     return 
-
+ 
 @app.post('/manage/init')
 def init(session: SessionDep):
     query = text("""select * from cars where id=1""")
